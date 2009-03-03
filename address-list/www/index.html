@@ -1,0 +1,283 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Strict//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<title>Contact list on iPhone/iPod touch webkit</title>
+<meta name="description" content="The following demo works only on iPhone and iPod Touch +2.x">
+
+<script type="text/javascript" src="iscroll.js"></script>
+
+<script type="text/javascript">
+
+
+/**
+ * 
+ * Find more about the ABC control at
+ * http://cubiq.org/contact-list-on-webkit-for-iphone/8
+ *
+ * Copyright (c) 2009 Matteo Spinelli
+ * Released under the MIT license
+ * http://cubiq.org/dropbox/mit-license.txt
+ * 
+ * Version 1.0 - Last updated: 2009.02.12
+ * 
+ */
+
+function abc(el) {
+	this.element = el;
+
+	this.element.addEventListener('touchstart', this, false);
+}
+
+abc.prototype = {
+	handleEvent: function(e) {
+		switch(e.type) {
+			case 'touchstart': this.onTouchStart(e); break;
+			case 'touchmove': this.onTouchMove(e); break;
+			case 'touchend': this.onTouchEnd(e); break;
+		}
+	},
+	
+	onTouchStart: function(e) {
+		e.preventDefault();
+		this.element.className = 'hover';
+
+		var theTarget = e.target;
+		if(theTarget.nodeType == 3) theTarget = theTarget.parentNode;
+		theTarget = theTarget.innerText;
+
+		if( document.getElementById(theTarget) )
+			myScroll.scrollTo(-document.getElementById(theTarget).offsetTop, '0s');
+
+		this.element.addEventListener('touchmove', this, false);
+		this.element.addEventListener('touchend', this, false);
+
+		return false;
+	},
+
+	onTouchEnd: function(e) {
+		e.preventDefault();
+		this.element.className = '';
+
+		this.element.removeEventListener('touchmove', this, false);
+		this.element.removeEventListener('touchend', this, false);
+		
+		return false;
+	},
+
+	onTouchMove: function(e) {
+		e.preventDefault();
+		
+		var theTarget = document.elementFromPoint(e.targetTouches[0].clientX, e.targetTouches[0].clientY);
+		if(theTarget.nodeType == 3) theTarget = theTarget.parentNode;
+		theTarget = theTarget.innerText;
+
+		if( document.getElementById(theTarget) ) {
+			theTarget = -document.getElementById(theTarget).offsetTop;
+			if( theTarget<myScroll.maxScroll )
+				theTarget = myScroll.maxScroll;
+			
+			myScroll.scrollTo(theTarget, '0s');
+		}
+
+		return false;
+	}
+}
+
+function loaded() {
+	window.scrollTo(0,0);
+	
+	document.addEventListener('touchmove', function(e){ e.preventDefault(); return false; }, false);
+	
+	myScroll = new iScroll(document.getElementById('scroller'));
+	
+	new abc(document.getElementById('abc'));
+}
+
+window.addEventListener('load', function(){ setTimeout(function(){ loaded(); }, 100); }, true);
+
+</script>
+
+<style type="text/css" media="all">
+body, div, h1, h2, h3, dl, dt, dd, ul, li {
+	padding:0;
+	margin:0;
+	border:0;
+	font-family:arial;
+	font-weight:normal;
+	line-height:1;
+	font-size:100%;
+	list-style:none;
+	-webkit-user-select:none;
+}
+
+div {
+	width:320px;
+}
+
+#header {
+	height:43px; line-height:43px;
+	background:#6d84a2 url(header-bg.png) 0 0 repeat-x;
+	color:#fff;
+	font-size:20px; font-weight:bold;
+	text-shadow:rgba(0,0,0,0.6) 0 -1px 0;
+	text-align:center;
+	border-bottom:1px solid #2d3642;
+}
+
+#wrapper {
+	position:relative;	/* needed */
+	z-index:1;			/* needed and important */
+	height:379px;		/* needed */
+	overflow:hidden;	/* suggested */
+}
+
+#scroller {
+	width:320px;
+	padding-bottom:44px;
+}
+
+dt {
+	width:308px; height:21px; line-height:21px;
+	padding-left:12px;
+	font-size:19px; font-weight:bold;
+	background:#b8c1c8 url(letter-bg.png) 0 0 repeat-x;
+	color:#fff;
+	text-shadow:rgba(0,0,0,0.6) 0 1px 0;
+	border-bottom:1px solid #989ea4;
+}
+
+dt:first-child {
+	border-top:0;
+}
+
+dd {
+	width:310px; height:44px;
+	padding-left:10px;
+	line-height:44px;
+	font-size:20px;
+	border-bottom:1px solid #e0e0e0;
+}
+
+dd.last {
+	border-bottom:1px solid #717d85;
+}
+
+#abc {
+	position:absolute; z-index:1000;
+	top:48px; right:4px;
+	width:28px; height:364px;
+	-webkit-border-radius:14px;
+	text-align:center;
+	font-size:11px;
+	color:#6a737d;
+}
+
+#abc li {
+	padding-top:2px;
+	font-weight:bold;
+}
+
+#abc li:first-child {
+	padding-top:6px;
+}
+
+#abc.hover {
+	background:rgba(106,115,125,0.5);
+}
+
+#footer{
+  background:#6d84a2 url(header-bg.png) 0 -10px repeat-x;
+	color:#fff;
+	text-shadow:rgba(0,0,0,0.6) 0 -1px 0;
+	text-align:center;
+	border-top:1px solid #2d3642;
+	padding:10px 0;
+}
+</style>
+
+</head>
+<body>
+<div id="header">Address List</div>
+<ul id="abc">
+	<li>A</li>
+	<li>B</li>
+	<li>C</li>
+	<li>D</li>
+	<li>E</li>
+	<li>F</li>
+	<li>G</li>
+	<li>H</li>
+	<li>I</li>
+	<li>J</li>
+	<li>K</li>
+	<li>L</li>
+	<li>M</li>
+	<li>N</li>
+	<li>O</li>
+	<li>P</li>
+	<li>Q</li>
+	<li>R</li>
+	<li>S</li>
+	<li>T</li>
+	<li>U</li>
+	<li>V</li>
+	<li>W</li>
+	<li>X</li>
+	<li>Y</li>
+	<li>Z</li>
+	<li>#</li>
+</ul>
+
+<div id="wrapper">
+	<dl id="scroller">
+		<dt id="A">A</dt>
+		<dd>Aaaaaa <strong>Aaaaaa</strong></dd>
+		<dd>Aaaaaa <strong>Aaaaaa</strong></dd>
+		<dd>Aaaaaa <strong>Aaaaaa</strong></dd>
+		<dd>Aaaaaa <strong>Aaaaaa</strong></dd>
+		<dd class="last">Aaaaaa <strong>Aaaaaa</strong></dd>
+		<dt id="B">B</dt>
+		<dd>Bbbbbb <strong>Bbbbbb</strong></dd>
+		<dd>Bbbbbb <strong>Bbbbbb</strong></dd>
+		<dd>Bbbbbb <strong>Bbbbbb</strong></dd>
+		<dd class="last">Bbbbbb <strong>Bbbbbb</strong></dd>
+		<dt id="C">C</dt>
+		<dd>Cccccc <strong>Cccccc</strong></dd>
+		<dd>Cccccc <strong>Cccccc</strong></dd>
+		<dd>Cccccc <strong>Cccccc</strong></dd>
+		<dd class="last">Cccccc <strong>Cccccc</strong></dd>
+		<dt id="D">D</dt>
+		<dd>Dddddd <strong>Dddddd</strong></dd>
+		<dd>Dddddd <strong>Dddddd</strong></dd>
+		<dd>Dddddd <strong>Dddddd</strong></dd>
+		<dd>Dddddd <strong>Dddddd</strong></dd>
+		<dd class="last">Dddddd <strong>Dddddd</strong></dd>
+		<dt id="E">E</dt>
+		<dd>Eeeeee <strong>Eeeeee</strong></dd>
+		<dd>Eeeeee <strong>Eeeeee</strong></dd>
+		<dd>Eeeeee <strong>Eeeeee</strong></dd>
+		<dd class="last">Eeeeee <strong>Eeeeee</strong></dd>
+		<dt id="L">L</dt>
+		<dd>Llllll <strong>Llllll</strong></dd>
+		<dd>Llllll <strong>Llllll</strong></dd>
+		<dd>Llllll <strong>Llllll</strong></dd>
+		<dt id="O">O</dt>
+		<dd>Oooooo <strong>Oooooo</strong></dd>
+		<dd>Oooooo <strong>Oooooo</strong></dd>
+		<dd>Oooooo <strong>Oooooo</strong></dd>
+		<dt id="W">W</dt>
+		<dd>Wwwwww <strong>Wwwwww</strong></dd>
+		<dd>Wwwwww <strong>Wwwwww</strong></dd>
+		<dd>Wwwwww <strong>Wwwwww</strong></dd>
+		<dd>Wwwwww <strong>Wwwwww</strong></dd>
+		<dd><a href="http://cubiq.org/">www.cubiq.org</a></dd>
+	</dl>
+</div>
+<div id="footer">
+  Built with PhoneGap
+</div>
+
+</body>
+</html>
